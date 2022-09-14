@@ -576,16 +576,16 @@ export function setupPrimary() {
     }
   });
 
-  cluster.on("exit", (worker) => {
-    // notify all active workers
-    for (const workerId in cluster.workers) {
-      if (hasOwnProperty.call(cluster.workers, workerId)) {
-        cluster.workers[workerId].send({
-          source: MESSAGE_SOURCE,
-          type: EventType.WORKER_EXIT,
-          data: worker.id,
-        });
-      }
-    }
-  });
+  // cluster.on("exit", (worker) => {
+  //   // notify all active workers
+  //   for (const workerId in cluster.workers) {
+  //     if (hasOwnProperty.call(cluster.workers, workerId)) {
+  //       cluster.workers[workerId].send({
+  //         source: MESSAGE_SOURCE,
+  //         type: EventType.WORKER_EXIT,
+  //         data: worker.id,
+  //       });
+  //     }
+  //   }
+  // });
 }

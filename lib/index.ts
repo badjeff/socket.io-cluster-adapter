@@ -576,16 +576,24 @@ export function setupPrimary() {
     }
   });
 
-  // cluster.on("exit", (worker) => {
-  //   // notify all active workers
-  //   for (const workerId in cluster.workers) {
-  //     if (hasOwnProperty.call(cluster.workers, workerId)) {
-  //       cluster.workers[workerId].send({
-  //         source: MESSAGE_SOURCE,
-  //         type: EventType.WORKER_EXIT,
-  //         data: worker.id,
-  //       });
-  //     }
-  //   }
-  // });
+  var sigintted = false;
+  process.on('SIGINT', () => { sigintted = true; })
+
+  cluster.on("exit", (worker) => {
+    // After SIGINT, cluster master is going to kill itself.
+    // Updating WORKER_EXIT doesn't matter anymore.
+    // And most workers are might already dead.
+    if (sigintted) return;
+    
+    // notify all active workers
+    for (const workerId in cluster.workers) {
+      if (hasOwnProperty.call(cluster.workers, workerId)) {
+        cluster.workers[workerId].send({
+          source: MESSAGE_SOURCE,
+          type: EventType.WORKER_EXIT,
+          data: worker.id,
+        });
+      }
+    }
+  });
 }
